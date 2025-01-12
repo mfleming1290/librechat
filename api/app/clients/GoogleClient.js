@@ -15,7 +15,7 @@ const {
   Constants,
   AuthKeys,
 } = require('librechat-data-provider');
-const { encodeAndFormat } = require('~/server/services/Files/images');
+const { encodeAndFormat } = require('~/server/services/Files/encode');
 const Tokenizer = require('~/server/services/Tokenizer');
 const { getModelMaxTokens } = require('~/utils');
 const { sleep } = require('~/server/utils');
@@ -250,24 +250,23 @@ class GoogleClient extends BaseClient {
     const formattedMessages = [];
     const attachments = await this.options.attachments;
     const latestMessage = { ...messages[messages.length - 1] };
-    const files = await this.addImageURLs(latestMessage, attachments, VisionModes.generative);
+    const files = await this.addFileURLs(latestMessage, attachments, VisionModes.generative);
     this.options.attachments = files;
     messages[messages.length - 1] = latestMessage;
 
     for (const _message of messages) {
       const role = _message.isCreatedByUser ? this.userLabel : this.modelLabel;
       const parts = [];
-      parts.push({ text: _message.text });
-      if (!_message.image_urls?.length) {
-        formattedMessages.push({ role, parts });
-        continue;
-      }
 
-      for (const images of _message.image_urls) {
-        if (images.inlineData) {
-          parts.push({ inlineData: images.inlineData });
+      if (_message.file_urls?.length) {
+        for (const fileParts of _message.file_urls) {
+          if (fileParts.inlineData) {
+            parts.push({ inlineData: fileParts.inlineData });
+          }
         }
       }
+
+      parts.push({ text: _message.text });
 
       formattedMessages.push({ role, parts });
     }
@@ -277,20 +276,20 @@ class GoogleClient extends BaseClient {
 
   /**
    *
-   * Adds image URLs to the message object and returns the files
+   * Adds file URLs to the message object and returns the files
    *
    * @param {TMessage[]} messages
    * @param {MongoFile[]} files
    * @returns {Promise<MongoFile[]>}
    */
-  async addImageURLs(message, attachments, mode = '') {
-    const { files, image_urls } = await encodeAndFormat(
+  async addFileURLs(message, attachments, mode = '') {
+    const { files, file_urls } = await encodeAndFormat(
       this.options.req,
       attachments,
       EModelEndpoint.google,
       mode,
     );
-    message.image_urls = image_urls.length ? image_urls : undefined;
+    message.file_urls = file_urls.length ? file_urls : undefined;
     return files;
   }
 
@@ -324,7 +323,7 @@ class GoogleClient extends BaseClient {
 
     const { prompt } = await this.buildMessagesPrompt(messages, parentMessageId);
 
-    const files = await this.addImageURLs(latestMessage, attachments);
+    const files = await this.addFileURLs(latestMessage, attachments);
 
     this.options.attachments = files;
 
@@ -833,7 +832,7 @@ class GoogleClient extends BaseClient {
         text: `Please generate ${titleInstruction}
 
     ${convo}
-    
+
     ||>Title:`,
         isCreatedByUser: true,
         author: this.userLabel,

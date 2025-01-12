@@ -27,7 +27,7 @@ const {
   titleInstruction,
   createContextHandlers,
 } = require('./prompts');
-const { encodeAndFormat } = require('~/server/services/Files/images/encode');
+const { encodeAndFormat } = require('~/server/services/Files/encode');
 const Tokenizer = require('~/server/services/Tokenizer');
 const { spendTokens } = require('~/models/spendTokens');
 const { isEnabled, sleep } = require('~/server/utils');
@@ -369,13 +369,13 @@ class OpenAIClient extends BaseClient {
    * @param {MongoFile[]} files
    * @returns {Promise<MongoFile[]>}
    */
-  async addImageURLs(message, attachments) {
-    const { files, image_urls } = await encodeAndFormat(
+  async addFileURLs(message, attachments) {
+    const { files, file_urls } = await encodeAndFormat(
       this.options.req,
       attachments,
       this.options.endpoint,
     );
-    message.image_urls = image_urls.length ? image_urls : undefined;
+    message.image_urls = file_urls.length ? file_urls : undefined;
     return files;
   }
 
@@ -418,7 +418,7 @@ class OpenAIClient extends BaseClient {
         };
       }
 
-      const files = await this.addImageURLs(
+      const files = await this.addFileURLs(
         orderedMessages[orderedMessages.length - 1],
         attachments,
       );
