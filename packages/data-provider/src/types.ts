@@ -100,7 +100,14 @@ export type TError = {
   };
 };
 
-export type TBackupCode = {
+export type TPasskey = {
+  id: string;
+  publicKey: Buffer;
+  counter: number;
+  transports: string[];
+  };
+
+  export type TBackupCode = {
   codeHash: string;
   used: boolean;
   usedAt: Date | null;
@@ -115,6 +122,7 @@ export type TUser = {
   role: string;
   provider: string;
   plugins?: string[];
+  passkeys?: TPasskey[];
   backupCodes?: TBackupCode[];
   createdAt: string;
   updatedAt: string;
