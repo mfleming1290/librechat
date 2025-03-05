@@ -775,6 +775,14 @@ export function getBanner(): Promise<t.TBannerResponse> {
   return request.get(endpoints.banner());
 }
 
+
+export const updateUserEncryption = (
+  payload: t.UpdateUserEncryptionRequest,
+): Promise<t.UpdateUserEncryptionResponse> => {
+  return request.put(endpoints.encryption(), payload);
+};
+
+
 export function enableTwoFactor(): Promise<t.TEnable2FAResponse> {
   return request.get(endpoints.enableTwoFactor());
 }
