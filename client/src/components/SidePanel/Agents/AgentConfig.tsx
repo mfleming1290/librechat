@@ -15,9 +15,9 @@ import { cn, defaultTextProps, removeFocusOutlines, getEndpointField, getIconKey
 import { useCreateAgentMutation, useUpdateAgentMutation } from '~/data-provider';
 import { useLocalize, useAuthContext, useHasAccess } from '~/hooks';
 import { useToastContext, useFileMapContext } from '~/Providers';
-import { icons } from '~/components/Chat/Menus/Endpoints/Icons';
 import Action from '~/components/SidePanel/Builder/Action';
 import { ToolSelectDialog } from '~/components/Tools';
+import { icons } from '~/hooks/Endpoint/Icons';
 import DuplicateAgent from './DuplicateAgent';
 import { processAgentOption } from '~/utils';
 import AdminSettings from './AdminSettings';
